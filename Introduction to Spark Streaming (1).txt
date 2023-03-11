@@ -1,0 +1,389 @@
+Data Streaming-- consists of wide variety of data.Tihs i/p data needsto be processed 
+sequentially and incrementally on record by record basis overtime, and used for awidevariety 
+of analysis.
+
+what is batch processing--it is a method of running hgh vol repetitve data jobs.
+Allows users to process the data when computing resources are avilable with little or no user interferance.
+and writethe o/pto storage.
+
+tools and frameworkfor batch proce--
+spark and map reduce,informatica ,aalteryx, amazon red shift,google big query,etc.
+
+Batch Processing vs Stream Processing--
+Data Scope--queries or processing over all or most of the data in the dataset.
+strreamprocessing queries or processig over data within a rolling timewindow or on just 
+te most recent data record.
+Data set--large batches of data,Sp-cont streamsof data
+Performance-latency could be minshrsor days.Latency must be in millisecs
+Complex Analytics--simple aggregations like avg time spent.Complex agg like sliding Windows.
+
+Which 1 to coose--
+Batch proces--invoices,payroll processes
+streamprocessing--cyber security and fraud deection.
+
+StreamProcessing--it is the processing of data in motion or in other words, computing on data directly as it is produced or revealed.
+Apache Spark framework would actually process data in micro-batches.
+Apache flink and apache flume.
+
+
+Issues with streamprocessing--
+build 2 stacks-1 for batch and 1 for streaming. Often both process samedata.
+Existing frameworks cannot doboh smultaneously--
+-either stream processing of 100s of MB/s with low latency or Batch Processsing of TBs of data with high latency.
+Extremely painful tomaintain 2 diff sacks because-
+diff prog modules,doubles implemnetation effort,doubles operationl effort.
+In traditionalproc model there are -apipeline ofnodes,each node maintains mutable state,each i/p record
+updates the state and new records are sent out.
+Also,mutable state is lost if node fails. Making stateful stream processing fault-tolerant is challenging.
+
+Additional challenges are--scalability,ordering,consistency anddurability,fault tolerance
+
+Introductiontoapache spark--
+Apache spark framework comes packaged with noof componentswhich together form Spark ecosystem.
+It consists of spark sql,spark streaming,MLib,GraphX (Graph Computation)--all working over spark core API.
+
+Spark core API do basic funcionalities like--memory mgmt,scheduling andmanagingjobs,task dispatching.
+Spark sql library allows towork with structured and unstructured data. It also allows to run sql queries onbig data.
+It iscompatible with hive.
+
+SprkStreaming--batch and realtime data,fast failure recovery,structured streaming.
+Compatibl with mutliple data ingestion tools flume,sqoop and kafka.
+
+MLib--scalable MLlibrary,regression,classification,clustering,collaborative filtering,ML pipelines
+
+GraphX librarry--enables graph parallel compuaion,graph algos and builders , availableonly for scala.
+
+Apache Spark---It is a parallel data processing engine for big data and ML apps designed to run on  a cluster of computers.
+It is not an alternative to Hadoop but tohadoopmap reduce.
+
+Its features--polyglot--sparkisproduced using scala but it provids apis forother lang like java,pyon,Rwhich allows u tocode in ur lang.
+Flexibility--u can run it on standalone cluster and alsoon hadoop yarn,kubernetes and apache mesos.It can even ingest data frommultiple sources like-
+cassandra,hbase,mongoDB and many others.
+Unified engine--it comespackaged with High level linbrarieslike sparksql,spark mlib,streaming and graph processing.
+In memory computation--hadoopmap reduce has to write every data in a disk there by increasing the
+number of transfers between the disk and the memory.Where as spark stores resultsin memory.There by decreasing the overhead and it makesit 100 times faster.
+Real-time streamprocessing--hadoop cannot dotis.
+
+Use cases--uber,netflix,etc
+
+Spark Streaming--itis an extension of the coresapark API that enables
+scalable,high throughput,fault tolerance.
+
+i/psources-->data processing through spark streaming through map, reduce,join etc-->external systems
+
+spaerk ecosystem--consisits of spark core api which isthe heart of spark eosystem.
+Itis the underlying general execution of the spark platform that all other funcionalities are build on top of.
+Its 4 extensions are-spark sql,spark streamig,mlib,graphx.
+
+
+High levelview of sparkstreaming are-
+data streams-->receiver-->breaks the data tinto small batche of dataor RDDs-->and after processing data is pushed onto various sources 
+like database,warehouse,etc.
+
+MicroBatch Architecture--
+the stream is treated as a series of batches of data.New batches are created at regular timeintervals.The size of time intervals is called batch interval.
+The batch intervalis typically between 500ms and several secs.
+
+Spark Streaming benefits--fast recvery,load balancing,combining streaming data 
+with static datasets,integraion with advanced libraries.
+Spark streming has unified engines that supports batch processing,spark streaming and even live streaming data. 
+
+traditional Sreamprocesssing systems--here conti operator nodes arethere which process the stream data 1 record ata time and fwdsthe recordstoother operatorsinthe pipeline.
+Then there are sourceoperators for receivingte data from ingestion systems and sink operatorsthat o/pto downstreamsystems.
+
+Challenges with it--failure and recovery,load balancing,unificationof workloads,advanced analytics.
+
+Dstreams--(Discretized Streams)---Dstreams are tosparkstreaming what rdds aretospark.
+These are the basic abstractionin spak streaming.
+Apps make progress by ingesting transforming and exporting Dstreams.
+Conceptually,aDstream converts a potentially endless flow of data into discrete batches of RDDs.
+Any operaions applied on a Dstream translates to operaions on the underlying RDDs. RDD transformation are computed by SparkEngine.
+
+
+Architecture of Spark Streaming : DStreams--
+
+Benefits of Dstreamprocessing--dynamicload balancing,fast failure and straggler recovery--failed tasks arerelaunched on all other nodes.Faster recovery by using multiple node for recompuation.
+unification of various workloads.
+
+Spark Streaming Basics---
+Streaming Context--
+Spark context is the entry point to any spark functionality.It is responsible 
+for submit jobs,ask for resources,schedule tasks,send tasks and getting job result.
+
+Streaming context--Itisthe main entry point for real-time applications.Connecion of the driver prog with spark engine.
+Read data from various real-time sources and convert it to Dstream.Also handles scheduling,transparent to the user.
+
+Streaming Context States--Initialized,Active,Stopped.
+
+To execute a spark streaming app, weneed to define the streamingCntext--
+
+from pyspark import SparkContext
+from pyspark.streaming import StreamingContext
+sc=SparkContext(master,appName)
+ssc=StreamingContext(sc,1) --this opens the gate for streaming to start. 
+next we need todefine batch interval =1 to fetch the data. Here,master is a Spark,Mesos or YARN cluster URL.
+to run ur code in localmode,use-- "local[K]" where K>=2 represents parallelism.
+appname is the name os ur app. Batch Interval time interval(in secs) of each batch.
+
+SparkStreaming Data Sources--Diff streams these Dstrams can be created,but they are associated with a receiver.Someofthe receiver
+areavailbale directly from SreaminContext apis like file streams,tcpsockets,queues of RDD.
+These 3 are the basic data sources.
+
+File streams--for reading data fromfiles on any file system compatible with he HDFS API.File streams do not reuire running a receiver.
+For simple text files,the easiest metod is StreamingContext.textFileStream(dataDirectory)
+file stream isnot available in the pythonAPI only textFileStream is available.
+
+textileStream(DataDirectory)--creates ani/p stream from new files that enters a specific directory.
+def simple_text_to_stream(ssc):
+     ssc.textFileStream('/data').pprint()
+
+parameters-
+dataDirectory:filepath for a folder with new files being added after the start of the stream.
+
+TCP Sockets--normally,a server runs on a specific computer and has a socket that is bound to a 
+specific port no.
+server-port-listens<-----conn req----client-port
+client tries tomake a conn with the server on a specificport no.
+upon acceptance, the server gets a new socket bound to the same localport
+server-port-listens-->conn--->client-port
+
+code--
+sc=SparkContext()
+ssc=StreamingContext(sc,10)
+Socket_stream=ssc.socketTextStream("127.0.0.1",9999)
+
+Queues of RDD---For testing a spark streaming app with test data,each rdd pushed into the queue
+will be treated asa batch of data inthe Dstream and processed like a stream.
+
+queueStream(rdds,oneAtATime=True,default=None)--creates an i/pstream froma queue of RDDsorlist.
+def queue_example(ssc):
+	ssc.queueStream[range(5),['a','b'],['c']],oneAtATime=True).pprint()
+parameters--Rdds:queue of rdds
+oneAtATime-pick one rdd each time or pick allof them once.
+default-the default rdd is nomore in rdds.
+
+Advanced Sources like kafka--available through extra utility classes.
+use of external non spark libraries.Advanced sources are not avilablein spark-shell
+ifu wanttousethem,download the corresponding Mavan artifac JAR.eg Apache Kafka,Amazon Kinesis
+
+CustomeSources--DStreams can also be creaed with custom data sources.
+CustomSources are not supported in python.Input DStreams can be created out of custom datasources. Allu need todo isimplement auser-defined receiver.
+
+
+Typesof Operations--1.Transformations on DStreams and 2.Output Operations--write to external systems.
+
+Once u create a streaming context,first operaion to be applied is Transformations--which gives a new Dstream from a previous one.
+for eg,one common transformation filtering of data.
+2 types of transformations are--stateless- in this the transformation of each batch doesnot depend on  the transformation of the previous batch.
+statefule--use previous batches data to compute   data for current batch.
+They include slidingwindow.
+
+Stateless transformations--
+processsing of each batch has no dependency on the data of previous batches.Similar to RDDs on every batch-
+map(),filter(),reduceByKey(),etc,cogroup(),join(),leftOuterJoin,etc
+-Performing aoperations on Dstreams is euivalent to performing operations on underlying 
+RDD operations on each batch.
+
+Somepopular transformations are--
+map(func)-return a new DStream by passing each element of the source DStream through a function func
+flatmap(func)-similar to map,but each i/p item can be mapped to0 ormore o/p items.
+filter(func)-return a new DStream by selecting only the records of the source DStream on which func returns true.
+union(otherStream)-return a new DStream that contains the union of the elements of the source DStream and the otherDStream
+join(otherStream)-When called on 2 DSTreams of(k,v) and (k,w) pairs, return a new DStream
+of(k,(v,w)) pairs with allpairs of elements for each key.
+
+Few more are--count(),reduce(),cogroup(),countByValue(),reduceByKey(),transform()--------basicsofTransformations.ipynb----------
+
+https://spark.apache.org/docs/latest/streaming-programming-guide.html#transformations-on-dstreams
+
+Transformation op--- If stateless transformations are insufficient,these streams cmoes with the advance operator called transfor operation.
+this allows arbitrary RDD-to-RDD funcs tobe applied on a DStream.It can be used to apply ny RDD op that
+is not exposed in the DStream API.eg--the functionality of joining every baatch in a data stream with another dataset which is not directly exposed in the DStream API.
+egwe can do he realtime data cleaning with transfor op by applying precomputed spam info on RDD and applying transform() to get a filtered stream.
+
+transformoperation.ipynb---------------------------------
+
+https://spark.apache.org/docs/latest/streaming-programming-guide.html#transform-operation
+
+foreachRDD--ti is again a very powerful transformation and it allowsu to apply any  transformation on each rdd
+foreachrdd demo.ipynb-------------------------------------------------
+
+https://spark.apache.org/docs/latest/streaming-programming-guide.html#design-patterns-for-using-foreachrdd
+
+Output Operaions on DStreams- These opsallows DStreams data tobe pushed out to externalsystems like a database 
+or a file system.They trigger the actual execution of all theDstreamtransformations.
+
+
+print()--prints first 10 elements of every batch of data ina DStream on thedriver node running the strreaming application.Called aspprintin pythonAPI
+saveAsTextFiles()--save this DStream's contents as text files.
+saveAsObjectFiles(prefix,[suffix])--Save this DStream'scontents as sequenceFilesof serialized Java objects.
+Not availablein PytonAPI.
+saveAsHadoopFiles(prefix,[suffix])--Save DStream contents as Hadoop Files.Not availablein PytonAPI.
+foreachRDD(func) -- this is the most generic o/p operator that applies a function func toeach RDD generated fromthe stream.This func should push the data in each
+RDD to an external system,such as saving the RDD to files,or writing it over the n/w to a db.
+
+outputoperationsonRDDs.ipynb-----
+read DrSeuss.txt----------------------------
+
+Stateful Transformation----
+Staetfulstream processing means that a "state" is shared between evens and tf past events can influence
+the way current evens are processed.
+2 main types to track stateful ops are--
+full session tracking and windowed ops.
+under fullSessionTracking we have--
+updateStateByKey(),mapWithState()
+WindowedOperations--window(),countByWindow(),reduceByWindow(),reduceByKeyAndWindow(),countByValueAndWindow()
+
+UpdateStateByKey(updateFunc,numPrtitions=None,initialRDD=None)--this tf return a new "state" DStream where the state for each key is updated by applying the given func
+on the previous state of the key and the new valuesof the key.
+Note-this requires checkpoint directory tobe configured.
+parameters-- 
+updateFunc- specify with a func how to update the state using the previous state and the new values from an i/p stream
+
+updateStaetByKey Demo,ipynb------------------------
+
+there is no PythonApI for mapWithState.
+
+https://databricks.com/blog/2016/02/01/faster-stateful-stream-processing-in-apache-spark-streaming.html
+
+Windowed Operations--it allows u to apply transforamtions over a sliding window of the data.
+Sliding window is the timeinterval between each transformation.
+Its 2 parameters are--
+window length--the duration of the window in secs.
+sliding interval--this is the interval at which the window op is performed in secs.
+Some common window ops are--
+window,countByWindow,reduceByWindow,reduceByKeyand Window,countByValueAndWindow
+All of these ops take 2 parameters-window lengh and slideInterval.
+
+Window function--Window(windowDuration,slideDuration=None)--retrun a new DStream in which each RDD contains
+allthe elements seen in a sliding window of time over this DStream.
+parameters-- window duration-width of the window
+slide duration-slidng interval ofthe window- means intervl after which new DStream will generate rdds.
+Now,thismust be a multiple of this DStream'sbatching interval.
+
+1.WindowOperationsDemo.ipynb-----------------
+
+countByWindow()-- return a new DStream in wich each RDD has a single element generated by counting the no.
+of elements in a window over this DSream.
+This is equivalent to window(windowDuration,slideDuration).count()
+
+
+Reduce by key and window(func,nvFunc,windowDuration,slideDuration=None,numPartitions=None,filterFunc=None)--retrun a new DStream
+by applying incremental reduceByKey over a slidingwindow.
+The reduced value ofover a new window is calcuated using the old window's reduce value.
+eg.- reduce the new values that entered the window(eg. adding new counts)<<click>>
+- "inverse reduce" the old values that left the window(eg. subtracting old counts)--
+parameters--
+funcfunction: associative and commutative reduce function
+invFuncfuncion: inverse function of reduceFunc
+windowDuration: width of the window,must bea multiple of this DStream's batching interval.
+slideDurationint(optional): sliding interval of the window
+numPartitionsint(optional): no.of partitions of each rdd in the new DStream
+filterFuncfuncion(optional):func to filter expired key-value pairs.
+
+2_countByWindow.ipynb-----
+reducebykeyandwindow.ipynb-----
+
+countByValueAndWindow(windowDuration,slideDuration,numPartitions=None)-- return a new DStream in which each RDD contains the count
+ofdistince elelments in DDs in a sliding window over this DStrem.
+parameters--
+windowDuration - widthof the window ,must be a multiple of this DStream's batching interval.
+slideDuration- sliding interval of te window
+numPartitions(optional)-no.ofpartitions of each RDD in the new DStream.
+
+13_countByValueAndWindow Transformation Demo.ipynb
+
+Faulttolerance--
+the streaming ops must operae 24*7.Spark recover from failures with the help of checkpointing.
+Checkpointing is the process of writing received records at checkpoint intervals to HDFS.
+When app starts forthe 1st time,it creates a streaming context.2nd -in the context creation ,we configure checkpoiting.
+which is done by-
+ceate StreamingContext()-create,set Checkpoint Path,define DStream.
+Then, when the prog restarts after the failure,t re-creates the streaming context fromthe checkpoint. i.e. checkpoint-->recover checkpoint-->start sreaming context.
+Typs of Data to Checkpoint--
+metadata checkpointing and data checkpointing
+metadata checkpointing--eg hdfs--Itincludes infolike--1.configurations,DStream ops, Incomplete batches
+Data Checkpointing--saves the generated rdds toreliablesources like hard drives.When upcoming RDDs depend on RDD's of previous batches.Thusit creates a long chain
+of dependency.TO avoid this,do periodic check pointing to a reliable storage like HDFS.
+
+So,metacheckpointing is required for dealing with driver failuresetc.
+Data Checkpointing for regular checkpointing  to a reliable storage  like hdfs.
+Typesof Checkpointing--
+Reliable CheckPointing--actual RDD is stored in a reliable distributed system. Call SparkContext.setCheckpointDir(directory: String)
+Local Checkpointing--
+RDD is persisted toloclstorage inthe executor.
+
+caching/Persisting---
+persist()--cache computed RDD and its lineage in memory.
+-Next op onthe same dataset willbefaster.
+-DStreams from window-based ops are automatically persisted.
+cache()-shorthand for persist atthe defaut storage level:MEMORY_ONLY
+
+Their benefits--saves the data by efualt in memory.Avoids re-computation of the whole lineage.Improves performance. 
+
+When to enable checkpointing--
+it must be enabled for apps with any of the follo requiremens--
+-usage of stateful transformations.
+-recovering from failures of te driver running the app.
+
+6_checkpointing_demo.ipynb------
+
+Structured Streaming--
+ It is a scalable and fault tolerant scheme built on spark sql engine.
+ 
+StructuredStreamingDemo.ipynb---
+
+python file required for the implemntation of this--
+StructuredStreamingDemo.py----
+
+then ,open a terminal window--
+$nc -lk 9990 enter---to run the netcat server
+now go to second terminal window--
+spark-submit --master yarn <path till StructuredStreamingDemo.py>
+
+now go to terminal 1--type any sentences like---
+
+hello world
+hello to this video
+---data from here is sent to the port 9990.
+in terminal 2 spark streaming is going to read the data ,create the dataframe and for each individual word.
+
+Output modes--
+The o/p mode is defined as what gets written out to external storage.
+complete mode--the entire updated result table will be written to the external storage.
+Append mode-only the new records are appended to the result table.
+Update mode--only the rows that were updated in the result table since the last trigger will be written to the external storage.
+
+Input Sources--
+file source-- reads files written in a directory as a stream of data.Files will be processed in the order of file modification time. Latest First reverses the order.Supported file formats include text,csv,json,orc,parquet
+
+Kafka--
+
+socket source
+
+rate source
+
+Basic Operations--u can apply all kinds of ops on streaming dfs/datasets like select , where, group by,map ,filter,flatmap. MOst of the common ops on df/dataset are supported for streaming.U can also register a streaming df/dataset as a temporary view and then apply SQL cmds on it.
+
+2_Operations_on_Streaming_Dataframes-Datasets.ipynb------
+
+Window Operations on time event--
+Watermarking--what happens if the window arrives late?
+
+window operations - watermarking demo-----.ipynb missing
+
+Output Sinks--
+file sink--stores the o/p to a directory.
+Kafka sink--stores the o/p to 1 or more topics in kafka
+for each sink--
+runs arbitrary computation on the records in the o/p.
+console sink--(for debugging)--prints the o/p to the console/stdout every time there is a trigger.
+memory sink(for debugging)-- the o/p is stored in memory as in-memory table.
+
+https://courses.analyticsvidhya.com/certificates/oyruyihsva 
+   
+ 
+
+
+
+ 
